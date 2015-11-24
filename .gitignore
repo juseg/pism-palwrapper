@@ -1,0 +1,7 @@
+# ignored paths
+/input
+/output
+
+# ignored files
+*.pyc
+*jobs.py
