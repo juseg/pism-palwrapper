@@ -1,0 +1,22 @@
+netcdf pddc {
+// PDD model parameters for the Cordillera ice sheet
+variables:
+        byte pism_overrides ;
+                pism_overrides:pdd_factor_snow = 0.00304 ;
+                pism_overrides:pdd_factor_snow_doc = "m K-1 day-1; Shea et al 2009, J. Glac. 55 (189): 123-130" ;
+                pism_overrides:pdd_factor_ice = 0.00459 ;
+                pism_overrides:pdd_factor_ice_doc = "m K-1 day-1; Shea et al 2009, J. Glac. 55 (189): 123-130" ;
+                pism_overrides:pdd_refreeze = 0.0 ;
+                pism_overrides:pdd_refreeze_doc = "fraction of melted snow and ice that refreezes" ;
+                pism_overrides:mask_icefree_thickness_standard = 8 ;
+                pism_overrides:bed_deformation_model = "lc" ;
+    pism_overrides:calving_methods = "float_kill" ;
+                pism_overrides:part_grid = "yes" ;
+                pism_overrides:part_redist = "yes" ;
+                pism_overrides:bootstrapping_geothermal_flux_value_no_var = 0.070 ;
+    pism_overrides:stress_balance_model = "ssa+sia" ;
+                pism_overrides:do_pseudo_plastic_till = "yes" ;
+                pism_overrides:pseudo_plastic_q = 0.25 ;
+                pism_overrides:pseudo_plastic_uthreshold = 100. ;
+                pism_overrides:till_effective_fraction_overburden = 0.02 ;
+}

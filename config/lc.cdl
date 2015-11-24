@@ -1,0 +1,6 @@
+netcdf pism_overrides {
+variables:
+        byte pism_overrides ;
+                pism_overrides:bed_deformation_model = "lc" ;
+                pism_overrides:bed_deformation_model_doc = "Selects a bed deformation model to use; possible choices are \'none\', \'iso\' (point-wise isostasy), \'lc\' (see [\\ref LingleClark], requires FFTW3)." ;
+}

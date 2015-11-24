@@ -1,0 +1,7 @@
+netcdf sdp {
+variables:
+        byte pism_overrides ;
+    pism_overrides:pdd_std_dev_use_param = "yes" ;
+    pism_overrides:pdd_std_dev_param_a = -0.15 ;
+    pism_overrides:pdd_std_dev_param_b = 0.66 ;
+}

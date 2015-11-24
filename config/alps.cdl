@@ -1,0 +1,18 @@
+netcdf alps {
+variables:
+    byte pism_overrides ;
+    // pdd
+        pism_overrides:pdd_factor_snow = 0.0032967032967033 ;
+        pism_overrides:pdd_factor_ice = 0.00879120879120879 ;
+        pism_overrides:pdd_refreeze = 0.0 ;
+    // bedrock
+        pism_overrides:bed_deformation_model = "lc" ;
+        pism_overrides:bootstrapping_geothermal_flux_value_no_var = 0.075 ;
+    // sliding
+        pism_overrides:stress_balance_model = "ssa+sia" ;
+        pism_overrides:do_pseudo_plastic_till = "yes" ;
+        pism_overrides:pseudo_plastic_q = 0.25 ;
+        pism_overrides:pseudo_plastic_uthreshold = 100. ;
+        pism_overrides:till_effective_fraction_overburden = 0.02 ;
+        pism_overrides:bootstrapping_tillphi_value_no_var = 45. ;
+}

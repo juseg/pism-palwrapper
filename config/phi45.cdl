@@ -1,0 +1,5 @@
+netcdf pism_overrides {
+variables:
+        byte pism_overrides ;
+                pism_overrides:bootstrapping_tillphi_value_no_var = 45. ;
+}
