@@ -198,10 +198,12 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
              out_dir, submit=True, **kwargs):
     """Create new directory, job script and config file."""
 
-    # make new directory
-    # FIXME: recursive mkdir
-    # FIXME: better handle existing dir case
-    os.mkdir(out_dir)
+    # make new directory or break if existing
+    try:
+        os.makedirs(out_dir)
+    except OSError:
+        print "Directory %s exists, skipping it." % out_dir
+        return 2
 
     # make config file
     c_path = make_config(config, out_dir=out_dir)
@@ -215,5 +217,6 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
     if submit == True:
         j_list = submit_chain(j_list)
 
-    # print list of submitted jobs
+    # print list of job scripts or submitted jobs ids
     print j_list
+    return 0
