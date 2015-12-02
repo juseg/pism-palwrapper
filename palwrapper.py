@@ -15,11 +15,17 @@ pism_root = os.path.expanduser('~/pism')
 
 
 # job script template
-# FIXME: add slurm magic comments
 # FIXME: make topg_to_phi an option
 template = '''#!/bin/bash
+#
+#SBATCH --job-name={prefix}
+#SBATCH --nodes={nodes}
+#SBATCH --time={time}
+#SBATCH --output={prefix}.log
+#SBATCH --error={prefix}.err
+
 {mpi_exec} {pism_exec} \\
-    -i {boot_path} -bootstrap \\
+    -i {boot_path} -bootstrap -o {prefix}.nc \\
     -config_override config.nc -topg_to_phi 15,45,0.0,200.0 \\
     -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
     -ys {ys} -ye {ye} -z_spacing equal \\
@@ -37,7 +43,7 @@ template = '''#!/bin/bash
     -extra_vars bmelt,climatic_mass_balance,cbase,csurf,lat,lon,mask,rank,\\
 tauc,taud_mag,tempicethk_basal,temppabase,tempsurf,thk,topg,usurf,\\
 velbase,velbase_mag,velsurf,velsurf_mag \\
-    -o {prefix}.nc > {prefix}.log 2> {prefix}.err
+
 '''
 
 
@@ -70,7 +76,7 @@ def make_config(config, out_dir=None):
 
 def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
                    mz=51, mbz=31, ys=0.0, ye=1000.0, yts=10, yextra=100,
-                   out_dir=None):
+                   nodes=1, time='24:00:00', out_dir=None):
     """Create job script and return its path."""
 
     # set region extents in km
