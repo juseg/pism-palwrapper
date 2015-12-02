@@ -140,6 +140,7 @@ def make_chain(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
                                    boot_file, atm_file, sd_file, dt_file, dsl_file,
                                    ys=ys, ye=ys+ychain, prefix=boot_job_name,
                                    bootstrap=True, **kwargs)
+    job_path_list = [boot_job_path]
 
     # create the next jobscripts if necessary
     i_file = boot_job_name + '.nc'
@@ -150,10 +151,11 @@ def make_chain(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
                                       i_file, atm_file, sd_file, dt_file, dsl_file,
                                       ys=y, ye=y+ychain, prefix=job_name,
                                       bootstrap=False, **kwargs)
+            job_path_list.append(job_path)
             i_file = job_name + '.nc'
 
     # return path to first job script
-    return boot_job_path
+    return job_path_list
 
 
 def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
@@ -169,9 +171,9 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
     c_path = make_config(config, out_dir=out_dir)
 
     # make job script
-    j_path = make_chain(reg, res,
+    j_list = make_chain(reg, res,
                         boot_file, atm_file, sd_file, dt_file, dsl_file,
                         out_dir=out_dir, **kwargs)
 
     # print path to new jobscript
-    print j_path
+    print j_list
