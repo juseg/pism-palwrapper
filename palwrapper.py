@@ -158,8 +158,44 @@ def make_chain(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
     return job_path_list
 
 
+def submit_job(job_path, depends=None):
+    """Submit a job script and return job ID."""
+
+    # tell sbatch to work in dir containing script
+    job_dir = os.path.dirname(job_path)
+    cmd = ['sbatch', '--workdir='+job_dir]
+
+    # add dependency if any
+    if depends is not None:
+        cmd.append('--dependency=afterok:'+depends)
+
+    # run sbatch command
+    cmd.append(job_path)
+    out = subprocess.check_output(cmd)
+
+    # return job id
+    job_id = out.rstrip('\n').split(' ')[-1]
+    return job_id
+
+
+def submit_chain(job_path_list):
+    """Submit a list of job scripts as a chain and return job IDs."""
+
+    # run first job
+    job_id = submit_job(job_path_list[0])
+    job_id_list = [job_id]
+
+    # run other jobs if any
+    for job_path in job_path_list[1:]:
+        job_id = submit_job(job_path, depends=job_id)
+        job_id_list.append(job_id)
+
+    # return list of job ids
+    return job_id_list
+
+
 def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
-             out_dir, **kwargs):
+             out_dir, submit=True, **kwargs):
     """Create new directory, job script and config file."""
 
     # make new directory
@@ -170,10 +206,14 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
     # make config file
     c_path = make_config(config, out_dir=out_dir)
 
-    # make job script
+    # make job script chain
     j_list = make_chain(reg, res,
                         boot_file, atm_file, sd_file, dt_file, dsl_file,
                         out_dir=out_dir, **kwargs)
 
-    # print path to new jobscript
+    # submit job chain
+    if submit == True:
+        j_list = submit_chain(j_list)
+
+    # print list of submitted jobs
     print j_list
