@@ -15,7 +15,6 @@ pism_root = os.path.expanduser('~/pism')
 
 
 # job script template
-# FIXME: make topg_to_phi an option
 template = '''#!/bin/bash
 #
 #SBATCH --job-name={prefix}
@@ -25,10 +24,10 @@ template = '''#!/bin/bash
 #SBATCH --error={prefix}.err
 
 {mpi_exec} {pism_exec} \\
-    -i {boot_path} -bootstrap -o {prefix}.nc \\
-    -config_override config.nc -topg_to_phi 15,45,0.0,200.0 \\
-    -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
-    -ys {ys} -ye {ye} -z_spacing equal \\
+    -i {boot_path} {boot_args} \\
+    -o {prefix}.nc \\
+    -ys {ys} -ye {ye}\\
+    -config_override config.nc \\
     -atmosphere given,lapse_rate,delta_T -temp_lapse_rate 6.0 \\
     -atmosphere_given_file {atm_path} \\
     -atmosphere_given_period 1 -timestep_hit_multiples 1 \\
@@ -42,9 +41,14 @@ template = '''#!/bin/bash
     -extra_file {prefix}-extra.nc -extra_times {yextra} \\
     -extra_vars bmelt,climatic_mass_balance,cbase,csurf,lat,lon,mask,rank,\\
 tauc,taud_mag,tempicethk_basal,temppabase,tempsurf,thk,topg,usurf,\\
-velbase,velbase_mag,velsurf,velsurf_mag \\
+velbase,velbase_mag,velsurf,velsurf_mag
 
 '''
+
+# FIXME: make topg_to_phi an option
+boot_args_template = '''\\
+    -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
+    -z_spacing equal -topg_to_phi 15,45,0.0,200.0 '''
 
 
 # set region extents in km
@@ -76,7 +80,8 @@ def make_config(config, out_dir=None):
 
 def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
                    mz=51, mbz=31, ys=0.0, ye=1000.0, yts=10, yextra=100,
-                   nodes=1, time='24:00:00', out_dir=None):
+                   nodes=1, time='24:00:00', out_dir=None, prefix='run',
+                   bootstrap=True):
     """Create job script and return its path."""
 
     # set region extents in km
@@ -90,14 +95,18 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
         my -= 1
 
     # parse paths
-    boot_path = os.path.join(pism_root, 'input', 'boot', boot_file)
     atm_path = os.path.join(pism_root, 'input', 'atm', atm_file)
     sd_path = os.path.join(pism_root, 'input', 'sd', sd_file)
     dt_path = os.path.join(pism_root, 'input', 'dt', dt_file)
     dsl_path = os.path.join(pism_root, 'input', 'dsl', dsl_file)
 
-    # prefix for output files
-    prefix = 'y%07d' % (ye-ys)
+    # bootstrapping arguments
+    if bootstrap == True:
+        boot_path = os.path.join(pism_root, 'input', 'boot', boot_file)
+        boot_args = boot_args_template.format(**locals())
+    else:
+        boot_path = boot_file
+        boot_args = ''
 
     # format script
     script = template.format(mpi_exec=mpi_exec, pism_exec=pism_exec,
@@ -110,6 +119,41 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
 
     # return path to job script
     return script_path
+
+
+def make_chain(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
+               **kwargs):
+    """Create several job scripts to run as a chain."""
+
+    # pop relevant keyword arguments
+    ys = kwargs.pop('ys', 0.0)
+    ye = kwargs.pop('ye', 1000.0)
+    ychain = kwargs.pop('ychain', None)
+
+    # set ychain to match run duration if invalid
+    if ychain is None or ychain <= 0.0 or ychain > (ye-ys):
+        ychain = ye - ys
+
+    # create the first jobscript
+    boot_job_name = 'y%07d' % (ychain)
+    boot_job_path = make_jobscript(reg, res,
+                                   boot_file, atm_file, sd_file, dt_file, dsl_file,
+                                   ys=ys, ye=ys+ychain, prefix=boot_job_name,
+                                   bootstrap=True, **kwargs)
+
+    # create the next jobscripts if necessary
+    i_file = boot_job_name + '.nc'
+    if ychain < (ye-ys):
+        for y in range(ys+ychain, ye, ychain):
+            job_name = 'y%07d' % (ychain+y-ys)
+            job_path = make_jobscript(reg, res,
+                                      i_file, atm_file, sd_file, dt_file, dsl_file,
+                                      ys=y, ye=y+ychain, prefix=job_name,
+                                      bootstrap=False, **kwargs)
+            i_file = job_name + '.nc'
+
+    # return path to first job script
+    return boot_job_path
 
 
 def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
@@ -125,9 +169,9 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
     c_path = make_config(config, out_dir=out_dir)
 
     # make job script
-    j_path = make_jobscript(reg, res,
-                            boot_file, atm_file, sd_file, dt_file, dsl_file,
-                            out_dir=out_dir, **kwargs)
+    j_path = make_chain(reg, res,
+                        boot_file, atm_file, sd_file, dt_file, dsl_file,
+                        out_dir=out_dir, **kwargs)
 
     # print path to new jobscript
     print j_path
