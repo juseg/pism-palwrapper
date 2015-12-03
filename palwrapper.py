@@ -213,10 +213,14 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
                         boot_file, atm_file, sd_file, dt_file, dsl_file,
                         out_dir=out_dir, **kwargs)
 
-    # submit job chain
+    # submit job chain and print job ids
     if submit == True:
         j_list = submit_chain(j_list)
+        print 'Submitted jobs: ' + ' '.join(j_list)
 
-    # print list of job scripts or submitted jobs ids
-    print j_list
+    # or print list of scripts
+    else:
+        print 'Create scripts:\n' + '\n'.join(j_list)
+
+    # no error, return 0
     return 0
