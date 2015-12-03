@@ -4,6 +4,7 @@
 
 import os
 import subprocess
+from netCDF4 import Dataset
 
 # global system settings
 mpi_exec = 'aprun -B'
@@ -69,12 +70,26 @@ extents = {
 
 def make_config(config, out_dir=None):
     """Create configuration file and return its path."""
-    # FIXME: read config files as dicts and export to netCDF
     # FIXME: allow to concatenate multiple files 
-    cdl_path = '%s/config/%s.cdl' % (pism_root, config)
+
+    # input and output file paths
+    txt_path = '%s/config/%s.txt' % (pism_root, config)
     nc_path = os.path.join(out_dir, 'config.nc')
-    cmd = ['ncgen', cdl_path, '-o', nc_path]
-    subprocess.call(cmd)
+
+    # initialize netCDF dataset
+    nc = Dataset(nc_path, 'w')
+    var = nc.createVariable('pism_overrides', 'i1')
+
+    # fill in pism overrides
+    with open(txt_path) as f:
+        for line in f:
+            k, v = line.rstrip().split(None, 1)
+            v = v.strip('"')
+            if not k.startswith('//'):
+                var.setncattr(k, v)
+
+    # close and return path to output file
+    nc.close()
     return nc_path
 
 
