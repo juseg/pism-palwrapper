@@ -70,29 +70,33 @@ extents = {
 
 def make_config(config, out_dir=None):
     """Create configuration file and return its path."""
-    # FIXME: allow to concatenate multiple files 
 
-    # input and output file paths
-    txt_path = '%s/config/%s.txt' % (pism_root, config)
-    nc_path = os.path.join(out_dir, 'config.nc')
+    # ensure that config is a list
+    if type(config) is str:
+        config = [config]
 
     # initialize netCDF dataset
+    nc_path = os.path.join(out_dir, 'config.nc')
     nc = Dataset(nc_path, 'w')
     var = nc.createVariable('pism_overrides', 'i1')
 
-    # fill in pism overrides
-    with open(txt_path) as f:
-        for line in f:
+    # loop on config files
+    for c in config:
+        c_path = '%s/config/%s.txt' % (pism_root, c)
 
-            # ignore what follows '//'
-            line = line.split('//', 1)[0].strip()
+        # fill in pism overrides
+        with open(c_path) as f:
+            for line in f:
 
-            # parse non-empty lines
-            if line:
-                k, v = line.split(':', 1)
-                k = k.strip()
-                v = v.strip().strip('"')
-                var.setncattr(k, v)
+                # ignore what follows '//'
+                line = line.split('//', 1)[0].strip()
+
+                # parse non-empty lines and overwrite existing values
+                if line:
+                    k, v = line.split(':', 1)
+                    k = k.strip()
+                    v = v.strip().strip('"')
+                    var.setncattr(k, v)
 
     # close and return path to output file
     nc.close()
