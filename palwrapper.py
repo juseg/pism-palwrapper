@@ -83,9 +83,15 @@ def make_config(config, out_dir=None):
     # fill in pism overrides
     with open(txt_path) as f:
         for line in f:
-            k, v = line.rstrip().split(None, 1)
-            v = v.strip('"')
-            if not k.startswith('//'):
+
+            # ignore what follows '//'
+            line = line.split('//', 1)[0].strip()
+
+            # parse non-empty lines
+            if line:
+                k, v = line.split(':', 1)
+                k = k.strip()
+                v = v.strip().strip('"')
                 var.setncattr(k, v)
 
     # close and return path to output file
