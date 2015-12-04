@@ -47,25 +47,21 @@ velbase,velbase_mag,velsurf,velsurf_mag
 '''
 
 # FIXME: make topg_to_phi an option
+# FIXME: make this a function instead
 boot_args_template = '''\\
     -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
     -z_spacing equal -topg_to_phi 15,45,0.0,200.0 '''
 
 
-# set region extents in km
-# FIXME: extract this info from boot files instead
-extents = {
-    # North America
-    'cordillera'    : (1500, 3000),
-    'olympic'       : ( 192,  192),
-    'puget'         : ( 600,  750),
-    # Europe
-    'alps'          : ( 900,  600),
-    # Asia
-    'haizishan'     : (  75,  125),
-    'kodar'         : ( 360,  360),
-    'stanovoy'      : ( 600,  400),
-    'transbaikalia' : (1000,  800)}
+def get_boot_grid(boot_file):
+    """Extract grid size from boot file."""
+
+    # extract lenght of x and y dimensions
+    nc = Dataset(boot_file)
+    mx = len(nc.dimensions['x'])
+    my = len(nc.dimensions['y'])
+    nc.close()
+    return mx, my
 
 
 def make_config(config, out_dir=None):
@@ -109,16 +105,6 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
                    bootstrap=True):
     """Create job script and return its path."""
 
-    # set region extents in km
-    x, y = extents[reg]
-
-    # compute number of grid points
-    mx = x*1000/res + 1
-    my = y*1000/res + 1
-    if atm_file.endswith('.cr.nc'):
-        mx -= 1
-        my -= 1
-
     # parse paths
     atm_path = os.path.join(pism_root, 'input', 'atm', atm_file)
     sd_path = os.path.join(pism_root, 'input', 'sd', sd_file)
@@ -132,6 +118,9 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
     else:
         boot_path = boot_file
         boot_args = ''
+
+    # get number of grid points from boot file
+    mx, my = get_boot_grid(boot_path)
 
     # format script
     script = template.format(mpi_exec=mpi_exec, pism_exec=pism_exec,
