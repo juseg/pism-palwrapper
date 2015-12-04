@@ -1,7 +1,0 @@
-netcdf pddc {
-// Turns off refreezing
-variables:
-        byte pism_overrides ;
-                pism_overrides:pdd_refreeze = 0.0 ;
-                pism_overrides:pdd_refreeze_doc = "fraction of melted snow and ice that refreezes" ;
-}

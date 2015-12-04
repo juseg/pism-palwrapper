@@ -1,0 +1,14 @@
+pdd_factor_snow: 0.00304
+pdd_factor_ice: 0.00459
+pdd_refreeze: 0.0
+mask_icefree_thickness_standard: 8
+bed_deformation_model: lc
+calving_methods: float_kill
+part_grid: yes
+part_redist: yes
+bootstrapping_geothermal_flux_value_no_var: 0.070
+stress_balance_model: ssa+sia
+do_pseudo_plastic_till: yes
+pseudo_plastic_q: 0.25
+pseudo_plastic_uthreshold: 100.
+till_effective_fraction_overburden: 0.02

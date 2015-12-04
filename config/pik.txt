@@ -1,0 +1,5 @@
+calving_front_stress_boundary_condition: yes
+part_grid: yes
+part_redist: yes
+kill_icebergs: yes
+

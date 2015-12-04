@@ -1,5 +1,0 @@
-netcdf ssa {
-variables:
-        byte pism_overrides ;
-    pism_overrides:stress_balance_model = "ssa+sia" ;
-}

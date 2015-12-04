@@ -1,0 +1,28 @@
+// pdd
+pdd_factor_snow: 0.00304
+pdd_factor_ice: 0.00459
+pdd_refreeze: 0.0
+
+// bedrock
+bed_deformation_model: lc
+bootstrapping_geothermal_flux_value_no_var: 0.070
+mantle_viscosity: 1.0e19
+
+// calving
+calving_methods: eigen_calving,thickness_calving
+eigen_calving_K: 1e19
+thickness_calving_threshold: 50.
+cfl_eigen_calving: true
+
+// PIK bundle
+part_grid: yes
+part_redist: yes
+calving_front_stress_boundary_condition: yes
+kill_icebergs: yes
+
+// sliding
+stress_balance_model: ssa+sia
+do_pseudo_plastic_till: yes
+pseudo_plastic_q: 0.25
+pseudo_plastic_uthreshold: 100.
+till_effective_fraction_overburden: 0.02

@@ -1,6 +1,0 @@
-netcdf pism_overrides {
-variables:
-        byte pism_overrides ;
-                pism_overrides:bootstrapping_geothermal_flux_value_no_var = 0.070 ;
-                pism_overrides:bootstrapping_geothermal_flux_value_no_var_doc = "W m-2; geothermal flux value to use if bheatflx variable is absent in bootstrapping file" ;
-}

@@ -1,0 +1,24 @@
+// Customized PDD parameters
+pdd_factor_snow: 0.00304
+pdd_factor_snow_doc: m K-1 day-1; measured on present glaciers in British Columbia by Shea et al 2009, J. Glac. 55 (189): 123-130
+pdd_factor_ice: 0.00459
+pdd_factor_ice_doc: m K-1 day-1; measured on present glaciers in British Columbia by Shea et al 2009, J. Glac. 55 (189): 123-130
+pdd_std_dev: 3.068094
+pdd_std_dev_doc: K; summer (JJA) average of monthly standard deviation over the entire domain computed from North American Regional Reanalysis data.
+pdd_refreeze: 0.0
+
+// Rebound model
+bed_deformation_model: lc
+
+// Thickness calving
+calving_methods: thickness_calving
+thickness_calving_threshold: 200.
+part_grid: yes
+part_redist: yes
+
+// Constant geothermal heat flux
+bootstrapping_geothermal_flux_value_no_var: 0.070
+
+// SSA sliding
+stress_balance_model: ssa+sia
+till_effective_fraction_overburden: 0.05
