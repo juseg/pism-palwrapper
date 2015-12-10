@@ -47,14 +47,13 @@ velbase,velbase_mag,velsurf,velsurf_mag
 '''
 
 
-# FIXME: make topg_to_phi an option
-def get_boot_args(boot_file, mz=51, mbz=31):
+def get_boot_args(boot_file, mz=51, mbz=31, topg_to_phi=None):
     """Prepare bootstrapping arguments for given file."""
 
     # boot arguments template
     boot_args_template = '''\\
         -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
-        -z_spacing equal -topg_to_phi 15,45,0.0,200.0 '''
+        -z_spacing equal '''
 
     # get number of grid points from boot file
     nc = Dataset(boot_file)
@@ -64,6 +63,11 @@ def get_boot_args(boot_file, mz=51, mbz=31):
 
     # return bootstrapping arguments
     boot_args = boot_args_template.format(**locals())
+
+    # add topography to phi args if given
+    if topg_to_phi:
+        boot_args += '-topg_to_phi %s ' % ','.join(map(str, topg_to_phi))
+
     return boot_args
 
 
@@ -117,7 +121,7 @@ def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file,
     # bootstrapping arguments
     if bootstrap == True:
         i_path = os.path.join(pism_root, 'input', 'boot', i_file)
-        boot_args = get_boot_args(i_path, *kwargs)
+        boot_args = get_boot_args(i_path, **kwargs)
     else:
         i_path = i_file
         boot_args = ''
