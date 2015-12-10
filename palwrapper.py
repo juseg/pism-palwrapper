@@ -111,16 +111,20 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
     dt_path = os.path.join(pism_root, 'input', 'dt', dt_file)
     dsl_path = os.path.join(pism_root, 'input', 'dsl', dsl_file)
 
-    # bootstrapping arguments
+    # parse path to input file
     if bootstrap == True:
         boot_path = os.path.join(pism_root, 'input', 'boot', boot_file)
-        boot_args = boot_args_template.format(**locals())
     else:
         boot_path = boot_file
-        boot_args = ''
 
     # get number of grid points from boot file
     mx, my = get_boot_grid(boot_path)
+
+    # bootstrapping arguments
+    if bootstrap == True:
+        boot_args = boot_args_template.format(**locals())
+    else:
+        boot_args = ''
 
     # format script
     script = template.format(mpi_exec=mpi_exec, pism_exec=pism_exec,
