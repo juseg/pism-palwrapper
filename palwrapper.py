@@ -46,22 +46,25 @@ velbase,velbase_mag,velsurf,velsurf_mag
 
 '''
 
+
 # FIXME: make topg_to_phi an option
-# FIXME: make this a function instead
-boot_args_template = '''\\
-    -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
-    -z_spacing equal -topg_to_phi 15,45,0.0,200.0 '''
+def get_boot_args(boot_file, mz=51, mbz=31):
+    """Prepare bootstrapping arguments for given file."""
 
+    # boot arguments template
+    boot_args_template = '''\\
+        -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
+        -z_spacing equal -topg_to_phi 15,45,0.0,200.0 '''
 
-def get_boot_grid(boot_file):
-    """Extract grid size from boot file."""
-
-    # extract lenght of x and y dimensions
+    # get number of grid points from boot file
     nc = Dataset(boot_file)
     mx = len(nc.dimensions['x'])
     my = len(nc.dimensions['y'])
     nc.close()
-    return mx, my
+
+    # return bootstrapping arguments
+    boot_args = boot_args_template.format(**locals())
+    return boot_args
 
 
 def make_config(config, out_dir=None):
@@ -100,9 +103,9 @@ def make_config(config, out_dir=None):
 
 
 def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
-                   mz=51, mbz=31, ys=0.0, ye=1000.0, yts=10, yextra=100,
+                   ys=0.0, ye=1000.0, yts=10, yextra=100,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
-                   bootstrap=True):
+                   bootstrap=True, **kwargs):
     """Create job script and return its path."""
 
     # parse paths
@@ -111,19 +114,12 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
     dt_path = os.path.join(pism_root, 'input', 'dt', dt_file)
     dsl_path = os.path.join(pism_root, 'input', 'dsl', dsl_file)
 
-    # parse path to input file
-    if bootstrap == True:
-        boot_path = os.path.join(pism_root, 'input', 'boot', boot_file)
-    else:
-        boot_path = boot_file
-
-    # get number of grid points from boot file
-    mx, my = get_boot_grid(boot_path)
-
     # bootstrapping arguments
     if bootstrap == True:
-        boot_args = boot_args_template.format(**locals())
+        boot_path = os.path.join(pism_root, 'input', 'boot', boot_file)
+        boot_args = get_boot_args(boot_path, *kwargs)
     else:
+        boot_path = boot_file
         boot_args = ''
 
     # format script
