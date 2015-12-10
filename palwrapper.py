@@ -50,24 +50,23 @@ velbase,velbase_mag,velsurf,velsurf_mag
 def get_boot_args(boot_file, mz=51, mbz=31, topg_to_phi=None):
     """Prepare bootstrapping arguments for given file."""
 
-    # boot arguments template
-    boot_args_template = '''\\
-        -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
-        -z_spacing equal '''
-
     # get number of grid points from boot file
     nc = Dataset(boot_file)
     mx = len(nc.dimensions['x'])
     my = len(nc.dimensions['y'])
     nc.close()
 
-    # return bootstrapping arguments
+    # prepare bootstrapping arguments
+    boot_args_template = '''\\
+        -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
+        -z_spacing equal '''
     boot_args = boot_args_template.format(**locals())
 
     # add topography to phi args if given
     if topg_to_phi:
         boot_args += '-topg_to_phi %s ' % ','.join(map(str, topg_to_phi))
 
+    # return bootstrapping arguments
     return boot_args
 
 
@@ -119,7 +118,7 @@ def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file,
     dsl_path = os.path.join(pism_root, 'input', 'dsl', dsl_file)
 
     # bootstrapping arguments
-    if bootstrap == True:
+    if bootstrap is True:
         i_path = os.path.join(pism_root, 'input', 'boot', i_file)
         boot_args = get_boot_args(i_path, **kwargs)
     else:
@@ -139,8 +138,7 @@ def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file,
     return script_path
 
 
-def make_chain(i_file, atm_file, sd_file, dt_file, dsl_file,
-               **kwargs):
+def make_chain(*filenames, **kwargs):
     """Create several job scripts to run as a chain."""
 
     # pop relevant keyword arguments
@@ -154,7 +152,7 @@ def make_chain(i_file, atm_file, sd_file, dt_file, dsl_file,
 
     # create the first jobscript
     boot_job_name = 'y%07d' % (ychain)
-    boot_job_path = make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file,
+    boot_job_path = make_jobscript(*filenames,
                                    ys=ys, ye=ys+ychain, prefix=boot_job_name,
                                    bootstrap=True, **kwargs)
     job_path_list = [boot_job_path]
@@ -164,7 +162,7 @@ def make_chain(i_file, atm_file, sd_file, dt_file, dsl_file,
     if ychain < (ye-ys):
         for y in range(ys+ychain, ye, ychain):
             job_name = 'y%07d' % (ychain+y-ys)
-            job_path = make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file,
+            job_path = make_jobscript(*filenames,
                                       ys=y, ye=y+ychain, prefix=job_name,
                                       bootstrap=False, **kwargs)
             job_path_list.append(job_path)
@@ -229,7 +227,7 @@ def make_all(i_file, atm_file, sd_file, dt_file, dsl_file, config,
                         out_dir=out_dir, **kwargs)
 
     # submit job chain and print job ids
-    if submit == True:
+    if submit is True:
         j_list = submit_chain(j_list)
         print 'Submitted jobs: ' + ' '.join(j_list)
 
