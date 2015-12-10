@@ -25,7 +25,7 @@ template = '''#!/bin/bash
 #SBATCH --error={prefix}.err
 
 {mpi_exec} {pism_exec} \\
-    -i {boot_path} {boot_args} \\
+    -i {i_path} {boot_args} \\
     -o {prefix}.nc \\
     -ys {ys} -ye {ye}\\
     -config_override config.nc \\
@@ -102,7 +102,7 @@ def make_config(config, out_dir=None):
     return nc_path
 
 
-def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
+def make_jobscript(reg, res, i_file, atm_file, sd_file, dt_file, dsl_file,
                    ys=0.0, ye=1000.0, yts=10, yextra=100,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
                    bootstrap=True, **kwargs):
@@ -116,10 +116,10 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
 
     # bootstrapping arguments
     if bootstrap == True:
-        boot_path = os.path.join(pism_root, 'input', 'boot', boot_file)
-        boot_args = get_boot_args(boot_path, *kwargs)
+        i_path = os.path.join(pism_root, 'input', 'boot', i_file)
+        boot_args = get_boot_args(i_path, *kwargs)
     else:
-        boot_path = boot_file
+        i_path = i_file
         boot_args = ''
 
     # format script
@@ -135,7 +135,7 @@ def make_jobscript(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
     return script_path
 
 
-def make_chain(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
+def make_chain(reg, res, i_file, atm_file, sd_file, dt_file, dsl_file,
                **kwargs):
     """Create several job scripts to run as a chain."""
 
@@ -151,7 +151,7 @@ def make_chain(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file,
     # create the first jobscript
     boot_job_name = 'y%07d' % (ychain)
     boot_job_path = make_jobscript(reg, res,
-                                   boot_file, atm_file, sd_file, dt_file, dsl_file,
+                                   i_file, atm_file, sd_file, dt_file, dsl_file,
                                    ys=ys, ye=ys+ychain, prefix=boot_job_name,
                                    bootstrap=True, **kwargs)
     job_path_list = [boot_job_path]
@@ -208,7 +208,7 @@ def submit_chain(job_path_list):
     return job_id_list
 
 
-def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
+def make_all(reg, res, i_file, atm_file, sd_file, dt_file, dsl_file, config,
              out_dir, submit=True, **kwargs):
     """Create new directory, job script and config file."""
 
@@ -224,7 +224,7 @@ def make_all(reg, res, boot_file, atm_file, sd_file, dt_file, dsl_file, config,
 
     # make job script chain
     j_list = make_chain(reg, res,
-                        boot_file, atm_file, sd_file, dt_file, dsl_file,
+                        i_file, atm_file, sd_file, dt_file, dsl_file,
                         out_dir=out_dir, **kwargs)
 
     # submit job chain and print job ids
