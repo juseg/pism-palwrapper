@@ -98,6 +98,10 @@ def make_config(config, out_dir=None):
                     k, v = line.split(':', 1)
                     k = k.strip()
                     v = v.strip().strip('"')
+                    try:
+                        v = float(v)
+                    except ValueError:
+                        pass
                     var.setncattr(k, v)
 
     # close and return path to output file
