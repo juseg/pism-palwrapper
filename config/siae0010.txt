@@ -1,1 +1,0 @@
-sia_enhancement_factor: 0.1

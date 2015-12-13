@@ -1,0 +1,2 @@
+sia_enhancement_factor: 0.9
+sia_enhancement_factor_doc: Min value for polar ice in Cuffey and Patterson (2010)

@@ -1,0 +1,2 @@
+sia_enhancement_factor: 12.0
+sia_enhancement_factor_doc: Max value for polar ice in Cuffey and Patterson (2010)

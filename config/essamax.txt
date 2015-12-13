@@ -1,0 +1,2 @@
+ssa: 2.4
+ssa_enhancement_factor_doc: Max value for polar ice in Cuffey and Patterson (2010)
