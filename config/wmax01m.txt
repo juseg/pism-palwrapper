@@ -1,0 +1,3 @@
+pism_config:hydrology_tillwat_max = 1.0
+pism_config:hydrology_tillwat_max_units = "meters"
+
