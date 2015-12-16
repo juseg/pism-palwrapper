@@ -64,7 +64,11 @@ def get_boot_args(boot_file, mz=51, mbz=31, topg_to_phi=None):
 
     # add topography to phi args if given
     if topg_to_phi:
-        boot_args += '-topg_to_phi %s ' % ','.join(map(str, topg_to_phi))
+        if topg_to_phi[0] != topg_to_phi[1]:
+            boot_args += '-topg_to_phi %s ' % ','.join(map(str, topg_to_phi))
+        else:
+            boot_args += ('-bootstrapping_tillphi_value_no_var %s '
+                          % topg_to_phi[0])
 
     # return bootstrapping arguments
     return boot_args
