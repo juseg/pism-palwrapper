@@ -142,7 +142,7 @@ def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file,
     return script_path
 
 
-def make_chain(*filenames, **kwargs):
+def make_chain(i_file, atm_file, sd_file, dt_file, dsl_file, **kwargs):
     """Create several job scripts to run as a chain."""
 
     # pop relevant keyword arguments
@@ -156,7 +156,8 @@ def make_chain(*filenames, **kwargs):
 
     # create the first jobscript
     boot_job_name = 'y%07d' % (ychain)
-    boot_job_path = make_jobscript(*filenames,
+    boot_job_path = make_jobscript(i_file, atm_file, sd_file, dt_file,
+                                   dsl_file,
                                    ys=ys, ye=ys+ychain, prefix=boot_job_name,
                                    bootstrap=True, **kwargs)
     job_path_list = [boot_job_path]
@@ -166,7 +167,8 @@ def make_chain(*filenames, **kwargs):
     if ychain < (ye-ys):
         for y in range(ys+ychain, ye, ychain):
             job_name = 'y%07d' % (ychain+y-ys)
-            job_path = make_jobscript(*filenames,
+            job_path = make_jobscript(i_file, atm_file, sd_file, dt_file,
+                                      dsl_file,
                                       ys=y, ye=y+ychain, prefix=job_name,
                                       bootstrap=False, **kwargs)
             job_path_list.append(job_path)
