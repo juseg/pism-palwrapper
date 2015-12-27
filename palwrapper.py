@@ -179,7 +179,10 @@ def make_chain(i_file, atm_file, sd_file, dt_file, dsl_file, **kwargs):
             job_path_list.append(job_path)
             i_file = job_name + '.nc'
 
-    # return path to first job script
+    # print list of job scripts
+    print 'Created scripts:\n' + '\n'.join(j_list)
+
+    # return list of job script
     return job_path_list
 
 
@@ -215,6 +218,10 @@ def submit_chain(job_path_list, depends=None):
         job_id = submit_job(job_path, depends=job_id)
         job_id_list.append(job_id)
 
+
+    # print list of job ids
+    print 'Submitted jobs: ' + ' '.join(job_id_list)
+
     # return list of job ids
     return job_id_list
 
@@ -237,14 +244,9 @@ def make_all(i_file, atm_file, sd_file, dt_file, dsl_file, config,
     j_list = make_chain(i_file, atm_file, sd_file, dt_file, dsl_file,
                         out_dir=out_dir, **kwargs)
 
-    # submit job chain and print job ids
+    # submit job chain
     if submit is True:
         j_list = submit_chain(j_list)
-        print 'Submitted jobs: ' + ' '.join(j_list)
-
-    # or print list of scripts
-    else:
-        print 'Create scripts:\n' + '\n'.join(j_list)
 
     # no error, return 0
     return 0
