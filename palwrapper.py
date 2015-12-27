@@ -2,6 +2,7 @@
 
 """A PISM wrapper for paleo-jobs."""
 
+import argparse
 import os
 import subprocess
 from netCDF4 import Dataset
@@ -247,3 +248,38 @@ def make_all(i_file, atm_file, sd_file, dt_file, dsl_file, config,
 
     # no error, return 0
     return 0
+
+
+def main():
+    """Argument parser called at execution time."""
+
+    # argument parser
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(title='commands')
+
+    # add subparsers
+    config_parser = subparsers.add_parser('config',
+        help='Not implemented yet.')
+    script_parser = subparsers.add_parser('script',
+        help='Not implemented yet.')
+    submit_parser = subparsers.add_parser('submit',
+        help='Submit a job or chain of jobs')
+
+    # arguments for submit command
+    submit_parser.set_defaults(func=submit_chain)
+    submit_parser.add_argument('job_path_list', type=str, nargs='+',
+                               help='List of scripts to be submitted')
+    submit_parser.add_argument('-d', '--depends', type=str, metavar='JOBID',
+                               help='Starts only after JOBID completed')
+
+    # get function and keyword arguments
+    args = parser.parse_args()
+    kwargs = vars(args)
+    func = kwargs.pop('func')
+
+    # call function with keyword arguments
+    return func(**kwargs)
+
+
+if __name__ == "__main__":
+    main()
