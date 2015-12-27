@@ -1,0 +1,51 @@
+// rheology from Cuffey and Paterson (2010)
+Paterson_Budd_A_cold: 2.847e-13
+Paterson_Budd_A_warm: 2.356e-02
+Paterson_Budd_Q_cold: 60e3
+Paterson_Budd_Q_warm: 115e3
+Paterson_Budd_A_cold_doc: Cuffey and Paterson, 2010
+Paterson_Budd_A_warm_doc: Cuffey and Paterson, 2010
+Paterson_Budd_Q_cold_doc: Cuffey and Paterson, 2010
+Paterson_Budd_Q_warm_doc: Cuffey and Paterson, 2010
+
+// enhancement factor
+sia_enhancement_factor: 2.0
+ssa_enhancement_factor: 1.0
+sia_enhancement_factor_doc: Holocene polar ice, Cuffey and Patterson, 2010
+ssa_enhancement_factor_doc: Holocene polar ice, Cuffey and Patterson, 2010
+
+// sliding
+stress_balance_model: ssa+sia
+do_pseudo_plastic_till: yes
+pseudo_plastic_q: 0.25
+pseudo_plastic_uthreshold: 100.
+till_effective_fraction_overburden: 0.02
+
+// hydrology
+hydrology_model: routing
+hydrology_tillwat_max: 2.0
+
+// PIK bundle
+part_grid: yes
+part_redist: yes
+calving_front_stress_boundary_condition: yes
+kill_icebergs: yes
+
+// calving
+calving_methods: eigen_calving,thickness_calving
+eigen_calving_K: 1e19
+thickness_calving_threshold: 50.
+cfl_eigen_calving: true
+
+// bedrock
+bed_deformation_model: lc
+bootstrapping_geothermal_flux_value_no_var: 0.070
+mantle_viscosity: 1.0e19
+mantle_viscosity_doc: GIA modelling, James et al., 2009
+
+// pdd model
+pdd_factor_snow: 0.00304
+pdd_factor_ice: 0.00459
+pdd_factor_ice_doc: Coast and Rocky Mts, Shea et al., 2009
+pdd_factor_snow_doc: Coast and Rocky Mts, Shea et al., 2009
+pdd_refreeze: 0.0
