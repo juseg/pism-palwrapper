@@ -202,11 +202,11 @@ def submit_job(job_path, depends=None):
     return job_id
 
 
-def submit_chain(job_path_list):
+def submit_chain(job_path_list, depends=None):
     """Submit a list of job scripts as a chain and return job IDs."""
 
     # run first job
-    job_id = submit_job(job_path_list[0])
+    job_id = submit_job(job_path_list[0], depends=depends)
     job_id_list = [job_id]
 
     # run other jobs if any
