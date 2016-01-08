@@ -180,7 +180,7 @@ def make_chain(i_file, atm_file, sd_file, dt_file, dsl_file, **kwargs):
             i_file = job_name + '.nc'
 
     # print list of job scripts
-    print 'Created scripts:\n' + '\n'.join(j_list)
+    print 'Created scripts:\n' + '\n'.join(job_path_list)
 
     # return list of job script
     return job_path_list
