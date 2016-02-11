@@ -35,8 +35,7 @@ template = '''#!/bin/bash
     -atmosphere_given_period 1 -timestep_hit_multiples 1 \\
     -atmosphere_lapse_rate_file {atm_path} \\
     -atmosphere_delta_T_file {dt_path} \\
-    -surface pdd -pdd_sd_period 1 \\
-    -pdd_sd_file {sd_path} {ocean_args} \\
+    {surface_args} {ocean_args} \\
     -ts_file {prefix}-ts.nc -ts_times {yts} \\
     -extra_file {prefix}-extra.nc -extra_times {yextra} \\
     -extra_vars bmelt,bwat,bwatvel,bwp,cell_area,climatic_mass_balance,dbdt,\\
@@ -73,13 +72,28 @@ def get_boot_args(boot_file, mz=51, mbz=31, topg_to_phi=None):
     return boot_args
 
 
+def get_surface_args(sd_file=None):
+    """Prepare ocean arguments if a sea level change file is provided."""
+
+    # always use PDD model with period of one year
+    surface_args = '-surface pdd -pdd_sd_period 1'
+
+    # check for PDD SD file
+    if sd_file:
+        sd_path = os.path.join(pism_root, 'input', 'sd', sd_file)
+        surface_args += ' \\\n        -pdd_sd_file %s' % sd_path
+
+    # return surface arguments
+    return surface_args
+
+
 def get_ocean_args(dsl_file=None):
     """Prepare ocean arguments if a sea level change file is provided."""
 
     # prepare ocean arguments template
     ocean_args_template = '''\\
         -ocean pik,delta_SL \\
-        -ocean_delta_SL_file {dsl_path} '''
+        -ocean_delta_SL_file {dsl_path}'''
 
     # check for sea level change file
     if dsl_file:
@@ -131,7 +145,7 @@ def make_config(config, out_dir=None):
     return nc_path
 
 
-def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file=None,
+def make_jobscript(i_file, atm_file, dt_file, sd_file=None, dsl_file=None,
                    ys=0.0, ye=1000.0, yts=10, yextra=100,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
                    bootstrap=True, **kwargs):
@@ -139,10 +153,10 @@ def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file=None,
 
     # parse paths
     atm_path = os.path.join(pism_root, 'input', 'atm', atm_file)
-    sd_path = os.path.join(pism_root, 'input', 'sd', sd_file)
     dt_path = os.path.join(pism_root, 'input', 'dt', dt_file)
 
-    # ocean arguments
+    # component model arguments
+    surface_args = get_surface_args(sd_file=sd_file)
     ocean_args = get_ocean_args(dsl_file=dsl_file)
 
     # bootstrapping arguments
@@ -166,7 +180,7 @@ def make_jobscript(i_file, atm_file, sd_file, dt_file, dsl_file=None,
     return script_path
 
 
-def make_chain(i_file, atm_file, sd_file, dt_file, **kwargs):
+def make_chain(i_file, atm_file, dt_file, **kwargs):
     """Create several job scripts to run as a chain."""
 
     # pop relevant keyword arguments
@@ -180,7 +194,7 @@ def make_chain(i_file, atm_file, sd_file, dt_file, **kwargs):
 
     # create the first jobscript
     boot_job_name = 'y%07d' % (ychain)
-    boot_job_path = make_jobscript(i_file, atm_file, sd_file, dt_file,
+    boot_job_path = make_jobscript(i_file, atm_file, dt_file,
                                    ys=ys, ye=ys+ychain, prefix=boot_job_name,
                                    bootstrap=True, **kwargs)
     job_path_list = [boot_job_path]
@@ -190,7 +204,7 @@ def make_chain(i_file, atm_file, sd_file, dt_file, **kwargs):
     if ychain < (ye-ys):
         for y in range(ys+ychain, ye, ychain):
             job_name = 'y%07d' % (ychain+y-ys)
-            job_path = make_jobscript(i_file, atm_file, sd_file, dt_file,
+            job_path = make_jobscript(i_file, atm_file, dt_file,
                                       ys=y, ye=y+ychain, prefix=job_name,
                                       bootstrap=False, **kwargs)
             job_path_list.append(job_path)
@@ -243,7 +257,7 @@ def submit_chain(job_path_list, depends=None):
     return job_id_list
 
 
-def make_all(i_file, atm_file, sd_file, dt_file, config,
+def make_all(i_file, atm_file, dt_file, config,
              out_dir, submit=True, **kwargs):
     """Create new directory, job script and config file."""
 
@@ -258,7 +272,7 @@ def make_all(i_file, atm_file, sd_file, dt_file, config,
     c_path = make_config(config, out_dir=out_dir)
 
     # make job script chain
-    j_list = make_chain(i_file, atm_file, sd_file, dt_file,
+    j_list = make_chain(i_file, atm_file, dt_file,
                         out_dir=out_dir, **kwargs)
 
     # submit job chain
