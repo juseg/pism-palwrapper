@@ -66,7 +66,7 @@ def get_boot_args(boot_file, mz=51, mbz=31, topg_to_phi=None):
     return boot_args
 
 
-def get_atm_args(atm_file=None, dt_file=None, fp_file=None):
+def get_atm_args(atm_file=None, dt_file=None, dp_file=None, fp_file=None):
     """Prepare atmosphere arguments depending on modifier files provided."""
 
     atm_args = ''
@@ -74,6 +74,7 @@ def get_atm_args(atm_file=None, dt_file=None, fp_file=None):
     # prepare list of modifiers
     mods = (',lapse_rate' +
             (',delta_T' if dt_file else '') +
+            (',delta_P' if dp_file else '') +
             (',frac_P' if fp_file else ''))
 
     # check for an atmosphere file
@@ -90,6 +91,12 @@ def get_atm_args(atm_file=None, dt_file=None, fp_file=None):
         dt_path = os.path.join(pism_root, 'input', 'dt', dt_file)
         atm_args += ''' \\
         -atmosphere_delta_T_file {dt_path}'''.format(**locals())
+
+    # check for a delta_P file
+    if atm_file and dp_file:
+        dp_path = os.path.join(pism_root, 'input', 'dp', dp_file)
+        atm_args += ''' \\
+        -atmosphere_delta_P_file {dp_path}'''.format(**locals())
 
     # check for a frac_P file
     if atm_file and fp_file:
@@ -173,7 +180,7 @@ def make_config(config, out_dir=None):
     return nc_path
 
 
-def make_jobscript(i_file, atm_file=None, dt_file=None,
+def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    fp_file=None, sd_file=None, dsl_file=None,
                    ys=0.0, ye=1000.0, yts=10, yextra=100,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
@@ -182,7 +189,7 @@ def make_jobscript(i_file, atm_file=None, dt_file=None,
 
     # component model arguments
     atm_args = get_atm_args(atm_file=atm_file, dt_file=dt_file,
-                            fp_file=fp_file)
+                            dp_file=dp_file, fp_file=fp_file)
     surface_args = get_surface_args(sd_file=sd_file)
     ocean_args = get_ocean_args(dsl_file=dsl_file)
 
