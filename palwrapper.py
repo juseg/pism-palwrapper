@@ -7,12 +7,9 @@ import os
 import subprocess
 from netCDF4 import Dataset
 
-# global system settings
+# global system settings (defaults for Piz Dora)
 mpi_exec = 'aprun -B'
-pism_version = '0.7.2'
-pism_arch = 'dora-intel'
-pism_exec = os.path.expanduser('~/software/opt/pism-%s/%s/bin/pismr'
-                               % (pism_version, pism_arch))
+pism_exec = '/users/jsegu/software/opt/pism-0.7.3/dora-intel/bin/pismr'
 pism_root = os.path.expanduser('~/pism')
 
 
@@ -201,6 +198,7 @@ def make_config(config, out_dir=None):
 def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    fp_file=None, sd_file=None, dsl_file=None,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
+                   mpi_exec=mpi_exec, pism_exec=pism_exec,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
                    **boot_kwargs):
     """Create job script and return its path."""
@@ -213,8 +211,7 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
     ocean_args = get_ocean_args(dsl_file=dsl_file)
 
     # format script
-    script = template.format(mpi_exec=mpi_exec, pism_exec=pism_exec,
-                             **locals())
+    script = template.format(**locals())
 
     # write script to file
     script_path = os.path.join(out_dir, prefix + '.sh')
