@@ -28,9 +28,8 @@ template = '''#!/bin/bash
 {mpi_exec} {pism_exec} \\
     -i {i_path} {boot_args} \\
     -o {prefix}.nc \\
-    -ys {ys} -ye {ye}\\
-    -config_override config.nc \\
-    {atm_args} {surface_args} {ocean_args} \\
+    -ys {ys} -ye {ye} \\
+    -config_override config.nc {atm_args} {surface_args} {ocean_args} \\
     -ts_file {prefix}-ts.nc -ts_times {yts} \\
     -extra_file {prefix}-extra.nc -extra_times {yextra} \\
     -extra_vars bmelt,bwat,bwatvel,bwp,cell_area,climatic_mass_balance,dbdt,\\
@@ -79,7 +78,7 @@ def get_atm_args(atm_file=None, dt_file=None):
     # check for an atmosphere file
     if atm_file:
         atm_path = os.path.join(pism_root, 'input', 'atm', atm_file)
-        atm_args += ''' \\
+        atm_args += '''\\
     -atmosphere given{mods} -temp_lapse_rate 6.0 \\
         -atmosphere_given_file {atm_path} \\
         -atmosphere_given_period 1 -timestep_hit_multiples 1 \\
@@ -99,12 +98,14 @@ def get_surface_args(sd_file=None):
     """Prepare ocean arguments depending on modifier files provided."""
 
     # always use PDD model with period of one year
-    surface_args = '-surface pdd -pdd_sd_period 1'
+    surface_args = '''\\
+    -surface pdd -pdd_sd_period 1'''
 
-    # check for PDD SD file
+    # check for a PDD SD file
     if sd_file:
         sd_path = os.path.join(pism_root, 'input', 'sd', sd_file)
-        surface_args += ' \\\n        -pdd_sd_file %s' % sd_path
+        surface_args += ''' \\
+        -pdd_sd_file {sd_path}'''.format(**locals())
 
     # return surface arguments
     return surface_args
@@ -113,17 +114,14 @@ def get_surface_args(sd_file=None):
 def get_ocean_args(dsl_file=None):
     """Prepare ocean arguments depending on modifier files provided."""
 
-    # prepare ocean arguments template
-    ocean_args_template = '''\\
-        -ocean pik,delta_SL \\
-        -ocean_delta_SL_file {dsl_path}'''
+    ocean_args = ''
 
-    # check for sea level change file
+    # check for a sea level change file
     if dsl_file:
         dsl_path = os.path.join(pism_root, 'input', 'dsl', dsl_file)
-        ocean_args = ocean_args_template.format(**locals())
-    else:
-        ocean_args = ''
+        ocean_args = '''\\
+    -ocean pik,delta_SL \\
+        -ocean_delta_SL_file {dsl_path}'''.format(**locals())
 
     # return ocean arguments
     return ocean_args
