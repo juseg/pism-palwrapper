@@ -26,7 +26,7 @@ template = '''#!/bin/bash
 #SBATCH --error={prefix}.err
 
 {mpi_exec} {pism_exec} \\
-    -i {i_path} {boot_args} \\
+    {input_args} \\
     -o {prefix}.nc \\
     -ys {ys} -ye {ye} \\
     -config_override config.nc {atm_args} {surface_args} {ocean_args} \\
@@ -39,31 +39,41 @@ thk,topg,usurf,velbase,velbase_mag,velsurf,velsurf_mag,wvelbase,wvelsurf
 '''
 
 
-def get_boot_args(boot_file, mz=51, mbz=31, topg_to_phi=None):
+def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, topg_to_phi=None):
     """Prepare bootstrapping arguments for given file."""
 
-    # get number of grid points from boot file
-    nc = Dataset(boot_file)
-    mx = len(nc.dimensions['x'])
-    my = len(nc.dimensions['y'])
-    nc.close()
+    # check if bootstrapping is needed
+    if bootstrap is True:
 
-    # prepare bootstrapping arguments
-    boot_args_template = '''\\
+        # get path to boot file
+        boot_path = os.path.join(pism_root, 'input', 'boot', i_file)
+
+        # get number of grid points from boot file
+        nc = Dataset(boot_path)
+        mx = len(nc.dimensions['x'])
+        my = len(nc.dimensions['y'])
+        nc.close()
+
+        # prepare bootstrapping arguments
+        input_args = '''-i {boot_path} \\
         -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
-        -z_spacing equal '''
-    boot_args = boot_args_template.format(**locals())
+        -z_spacing equal'''.format(**locals())
 
-    # add topography to phi args if given
-    if topg_to_phi:
-        if topg_to_phi[0] != topg_to_phi[1]:
-            boot_args += '-topg_to_phi %s ' % ','.join(map(str, topg_to_phi))
-        else:
-            boot_args += ('-bootstrapping_tillphi_value_no_var %s '
-                          % topg_to_phi[0])
+        # add topography to phi args if given
+        if topg_to_phi:
+            if topg_to_phi[0] != topg_to_phi[1]:
+                input_args += ' -topg_to_phi '
+                input_args += ','.join(map(str, topg_to_phi))
+            else:
+                input_args += ' -bootstrapping_tillphi_value_no_var '
+                input_args += topg_to_phi[0]
+
+    # otherwise use a relative path to input file
+    else:
+        input_args = '-i ' + i_file
 
     # return bootstrapping arguments
-    return boot_args
+    return input_args
 
 
 def get_atm_args(atm_file=None, lapse_rate=None,
@@ -192,22 +202,15 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    fp_file=None, sd_file=None, dsl_file=None,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
-                   bootstrap=True, **kwargs):
+                   **boot_kwargs):
     """Create job script and return its path."""
 
-    # component model arguments
+    # get input and component model arguments
+    input_args = get_input_args(i_file, **boot_kwargs)
     atm_args = get_atm_args(atm_file=atm_file, lapse_rate=lapse_rate,
                             dt_file=dt_file, dp_file=dp_file, fp_file=fp_file)
     surface_args = get_surface_args(sd_file=sd_file)
     ocean_args = get_ocean_args(dsl_file=dsl_file)
-
-    # bootstrapping arguments
-    if bootstrap is True:
-        i_path = os.path.join(pism_root, 'input', 'boot', i_file)
-        boot_args = get_boot_args(i_path, **kwargs)
-    else:
-        i_path = i_file
-        boot_args = ''
 
     # format script
     script = template.format(mpi_exec=mpi_exec, pism_exec=pism_exec,
