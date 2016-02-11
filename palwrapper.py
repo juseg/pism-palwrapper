@@ -84,7 +84,8 @@ def get_atm_args(atm_file=None, lapse_rate=None,
         atm_args += '''\\
     -atmosphere given{mods} \\
         -atmosphere_given_file {atm_path} \\
-        -atmosphere_given_period 1 -timestep_hit_multiples 1'''.format(**locals())
+        -atmosphere_given_period 1 \\
+        -timestep_hit_multiples 1'''.format(**locals())
 
     # check for a lapse rate value
     if atm_file and lapse_rate:
@@ -290,7 +291,6 @@ def submit_chain(job_path_list, depends=None):
         job_id = submit_job(job_path, depends=job_id)
         job_id_list.append(job_id)
 
-
     # print list of job ids
     print 'Submitted jobs: ' + ' '.join(job_id_list)
 
@@ -332,11 +332,14 @@ def main():
     subparsers = parser.add_subparsers(title='commands')
 
     # add subparsers
-    config_parser = subparsers.add_parser('config',
+    config_parser = subparsers.add_parser(
+        'config',
         help='Not implemented yet.')
-    script_parser = subparsers.add_parser('script',
+    script_parser = subparsers.add_parser(
+        'script',
         help='Not implemented yet.')
-    submit_parser = subparsers.add_parser('submit',
+    submit_parser = subparsers.add_parser(
+        'submit',
         help='Submit a job or chain of jobs')
 
     # arguments for submit command
