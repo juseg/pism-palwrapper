@@ -37,7 +37,8 @@ wvelbase,wvelsurf
 '''
 
 
-def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, topg_to_phi=None):
+def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, lz=5000, lbz=3000,
+                   topg_to_phi=None):
     """Prepare bootstrapping arguments for given file."""
 
     # check if bootstrapping is needed
@@ -54,7 +55,7 @@ def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, topg_to_phi=None):
 
         # prepare bootstrapping arguments
         input_args = '''-i {boot_path} \\
-        -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz 5000 -Lbz 3000 \\
+        -bootstrap -Mx {mx} -My {my} -Mz {mz} -Mbz {mbz} -Lz {lz} -Lbz {lbz} \\
         -z_spacing equal'''.format(**locals())
 
         # add topography to phi args if given
