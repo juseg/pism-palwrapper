@@ -30,8 +30,9 @@ template = '''#!/bin/bash
     -ts_file {prefix}-ts.nc -ts_times {yts} \\
     -extra_file {prefix}-extra.nc -extra_times {yextra} \\
     -extra_vars bmelt,bwat,bwatvel,bwp,cell_area,climatic_mass_balance,dbdt,\\
-dHdt,lat,lon,mask,rank,taub,tauc,taud,tempicethk_basal,temppabase,tempsurf,\\
-thk,topg,usurf,velbase,velbase_mag,velsurf,velsurf_mag,wvelbase,wvelsurf
+dHdt,diffusivity,lat,lon,mask,rank,taub,tauc,taud,tempicethk_basal,temppabase,\\
+tempsurf,thk,tillwat,topg,usurf,velbase,velbase_mag,velsurf,velsurf_mag,\\
+wvelbase,wvelsurf
 
 '''
 
