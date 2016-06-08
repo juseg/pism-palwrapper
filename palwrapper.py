@@ -142,7 +142,7 @@ def get_surface_args(sd_file=None):
     return surface_args
 
 
-def get_ocean_args(dsl_file=None):
+def get_ocean_args(dsl_file=None, om_file=None):
     """Prepare ocean arguments depending on modifier files provided."""
 
     ocean_args = ''
@@ -153,6 +153,12 @@ def get_ocean_args(dsl_file=None):
         ocean_args = '''\\
     -ocean pik,delta_SL \\
         -ocean_delta_SL_file {dsl_path}'''.format(**locals())
+
+    # check for an ocean mask file
+    if om_file:
+        om_path = os.path.join(pism_root, 'input', 'om', om_file)
+        ocean_args = '''\\
+        -ocean_kill_file {om_path}'''.format(**locals())
 
     # return ocean arguments
     return ocean_args
@@ -198,7 +204,7 @@ def make_config(config, out_dir=None):
 
 
 def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
-                   fp_file=None, sd_file=None, dsl_file=None,
+                   fp_file=None, sd_file=None, dsl_file=None, om_file=None,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
                    mpi_exec=mpi_exec, pism_exec=pism_exec,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
@@ -210,7 +216,7 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
     atm_args = get_atm_args(atm_file=atm_file, lapse_rate=lapse_rate,
                             dt_file=dt_file, dp_file=dp_file, fp_file=fp_file)
     surface_args = get_surface_args(sd_file=sd_file)
-    ocean_args = get_ocean_args(dsl_file=dsl_file)
+    ocean_args = get_ocean_args(dsl_file=dsl_file, om_file=om_file)
 
     # format script
     script = template.format(**locals())
