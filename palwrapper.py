@@ -8,8 +8,8 @@ import subprocess
 from netCDF4 import Dataset
 
 # global system settings (defaults for Piz Dora)
-mpi_exec = 'aprun -B'
-pism_exec = '/users/jsegu/software/opt/pism-0.7.3/dora-intel/bin/pismr'
+mpi_exec = 'srun --ntasks-per-node 36'
+pism_exec = '/users/jsegu/software/opt/pism-0.7.3/dora-gnu/bin/pismr'
 pism_root = os.path.expanduser('~/pism')
 
 
@@ -18,6 +18,7 @@ template = '''#!/bin/bash
 #
 #SBATCH --job-name={prefix}
 #SBATCH --nodes={nodes}
+#SBATCH --ntasks-per-node={ntasks_per_node}
 #SBATCH --time={time}
 #SBATCH --output={prefix}.log
 #SBATCH --error={prefix}.err
@@ -208,7 +209,7 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
                    mpi_exec=mpi_exec, pism_exec=pism_exec,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
-                   **boot_kwargs):
+                   ntasks_per_node=36, **boot_kwargs):
     """Create job script and return its path."""
 
     # get input and component model arguments
