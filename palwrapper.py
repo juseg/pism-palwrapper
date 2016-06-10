@@ -77,7 +77,7 @@ def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, lz=5000, lbz=3000,
 
 
 def get_atm_args(atm_file=None, lapse_rate=None,
-                 dt_file=None, dp_file=None, fp_file=None):
+                 dt_file=None, dp_file=None, fp_file=None, pp_file=None):
     """Prepare atmosphere arguments depending on modifier files provided."""
 
     atm_args = ''
@@ -86,7 +86,8 @@ def get_atm_args(atm_file=None, lapse_rate=None,
     mods = ((',lapse_rate' if lapse_rate else '') +
             (',delta_T' if dt_file else '') +
             (',delta_P' if dp_file else '') +
-            (',frac_P' if fp_file else ''))
+            (',frac_P' if fp_file else '') +
+            (',paleo_precip' if pp_file else ''))
 
     # check for an atmosphere file
     if atm_file:
@@ -121,6 +122,12 @@ def get_atm_args(atm_file=None, lapse_rate=None,
         fp_path = os.path.join(pism_root, 'input', 'fp', fp_file)
         atm_args += ''' \\
         -atmosphere_frac_P_file {fp_path}'''.format(**locals())
+
+    # check for a paleo_precip file
+    if atm_file and pp_file:
+        pp_path = os.path.join(pism_root, 'input', 'dt', pp_file)
+        atm_args += ''' \\
+        -atmosphere_paleo_precip_file {pp_path}'''.format(**locals())
 
     # return surface arguments
     return atm_args
@@ -205,7 +212,8 @@ def make_config(config, out_dir=None):
 
 
 def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
-                   fp_file=None, sd_file=None, dsl_file=None, om_file=None,
+                   fp_file=None, pp_file=None, sd_file=None, dsl_file=None,
+                   om_file=None,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
                    mpi_exec=mpi_exec, pism_exec=pism_exec,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
@@ -215,7 +223,8 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
     # get input and component model arguments
     input_args = get_input_args(i_file, **boot_kwargs)
     atm_args = get_atm_args(atm_file=atm_file, lapse_rate=lapse_rate,
-                            dt_file=dt_file, dp_file=dp_file, fp_file=fp_file)
+                            dt_file=dt_file, dp_file=dp_file, fp_file=fp_file,
+                            pp_file=pp_file)
     surface_args = get_surface_args(sd_file=sd_file)
     ocean_args = get_ocean_args(dsl_file=dsl_file, om_file=om_file)
 
