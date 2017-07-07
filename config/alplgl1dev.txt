@@ -1,0 +1,43 @@
+// rheology from Cuffey and Paterson (2010)
+flow_law.Paterson_Budd.A_cold: 2.847e-13
+flow_law.Paterson_Budd.A_warm: 2.356e-02
+flow_law.Paterson_Budd.Q_cold: 60e3
+flow_law.Paterson_Budd.Q_warm: 115e3
+flow_law.Paterson_Budd.A_cold_doc: Cuffey and Paterson, 2010
+flow_law.Paterson_Budd.A_warm_doc: Cuffey and Paterson, 2010
+flow_law.Paterson_Budd.Q_cold_doc: Cuffey and Paterson, 2010
+flow_law.Paterson_Budd.Q_warm_doc: Cuffey and Paterson, 2010
+
+// enhancement factor
+stress_balance.sia.enhancement_factor: 2.0
+stress_balance.ssa.enhancement_factor: 1.0
+stress_balance.sia.enhancement_factor_doc: Holocene polar ice, Cuffey and Patterson, 2010
+stress_balance.ssa.enhancement_factor_doc: Holocene polar ice, Cuffey and Patterson, 2010
+
+// sliding
+stress_balance.model: ssa+sia
+basal_resistance.pseudo_plastic.enabled: yes
+basal_resistance.pseudo_plastic.q: 0.25
+basal_resistance.pseudo_plastic.u_threshold: 100.
+basal_yield_stress.mohr_coulomb.till_effective_fraction_overburden: 0.02
+basal_yield_stress.mohr_coulomb.till_phi_default: 30.
+
+// ignore ocean
+ocean.always_grounded: yes
+
+// bedrock thermal model
+energy.bedrock_thermal_density: 3300.
+energy.bedrock_thermal_conductivity: 3.
+energy.bedrock_thermal_specific_heat_capacity: 1000.
+
+// pdd model
+surface.pdd.factor_snow: 0.0032967032967033
+surface.pdd.factor_ice: 0.00879120879120879
+surface.pdd.factor_snow_doc: 3 mm w.e. K-1, Huybrechts, 1998
+surface.pdd.factor_ice_doc: 8 mm w.e. K-1, Huybrechts, 1998
+surface.pdd.refreeze: 0.0
+
+// time stepping
+time_stepping.maximum_time_step: 1.0
+time_stepping.hit_extra_times: yes
+time_stepping.hit_ts_times: yes
