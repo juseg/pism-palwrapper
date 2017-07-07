@@ -7,9 +7,9 @@ import os
 import subprocess
 from netCDF4 import Dataset
 
-# global system settings (defaults for Piz Dora)
+# global system settings (defaults for Piz Daint)
 mpi_exec = 'srun --ntasks-per-node 36'
-pism_exec = '/users/jsegu/software/opt/pism-0.7.3/dora-gnu/bin/pismr'
+pism_exec = '/users/jsegu/software/opt/pism-0.7.3/daint-gnu/bin/pismr'
 pism_root = os.path.expanduser('~/pism')
 
 
@@ -22,6 +22,7 @@ template = '''#!/bin/bash
 #SBATCH --time={time}
 #SBATCH --output={prefix}.log
 #SBATCH --error={prefix}.err
+#SBATCH --constraint=mc
 
 {mpi_exec} {pism_exec} \\
     {input_args} \\
