@@ -1,0 +1,68 @@
+// rheology from Cuffey and Paterson (2010)
+flow_law.Paterson_Budd.A_cold: 2.847e-13
+flow_law.Paterson_Budd.A_warm: 2.356e-02
+flow_law.Paterson_Budd.Q_cold: 60e3
+flow_law.Paterson_Budd.Q_warm: 115e3
+flow_law.Paterson_Budd.A_cold_doc: Cuffey and Paterson, 2010
+flow_law.Paterson_Budd.A_warm_doc: Cuffey and Paterson, 2010
+flow_law.Paterson_Budd.Q_cold_doc: Cuffey and Paterson, 2010
+flow_law.Paterson_Budd.Q_warm_doc: Cuffey and Paterson, 2010
+
+// enhancement factor
+stress_balance.sia.enhancement_factor: 2.0
+stress_balance.ssa.enhancement_factor: 1.0
+stress_balance.sia.enhancement_factor_doc: Holocene polar ice, Cuffey and Patterson, 2010
+stress_balance.ssa.enhancement_factor_doc: Holocene polar ice, Cuffey and Patterson, 2010
+
+// sliding
+stress_balance.model: ssa+sia
+basal_resistance.pseudo_plastic.enabled: yes
+basal_resistance.pseudo_plastic.q: 0.25
+basal_resistance.pseudo_plastic.u_threshold: 100.
+basal_yield_stress.mohr_coulomb.till_effective_fraction_overburden: 0.02
+basal_yield_stress.mohr_coulomb.till_phi_default: 30.
+
+// PIK bundle
+geometry.grounded_cell_fraction: no
+geometry.part_grid.enabled: yes
+geometry.part_grid.reduce_frontal_thickness: yes
+geometry.remove_icebergs: yes
+stress_balance.calving_front_stress_bc: yes
+
+// calving
+calving.eigen_calving.K: 1e19
+calving.front_retreat.use_cfl: yes
+calving.methods: eigen_calving,thickness_calving
+calving.thickness_calving.threshold: 50.
+
+// bedrock thermal model
+energy.bedrock_thermal_density: 3300.
+energy.bedrock_thermal_conductivity: 3.
+energy.bedrock_thermal_specific_heat_capacity: 1000.
+bootstrapping.defaults.geothermal_flux: 0.070
+
+// bed deformation from Mey et al. (2016)
+bed_deformation.model: lc
+bed_deformation.lithosphere_flexural_rigidity: 2.4e+24   // 60km
+bed_deformation.mantle_density: 3300.
+bed_deformation.mantle_viscosity: 1e19
+bed_deformation.update_interval: 10.
+bed_deformation.lithosphere_flexural_rigidity_doc: James et al., 2009
+bed_deformation.mantle_density_doc: Mey et al., 2016
+bed_deformation.mantle_viscosity_doc: James et al., 2009
+
+// pdd model
+surface.pdd.factor_snow: 0.00304
+surface.pdd.factor_ice: 0.00459
+surface.pdd.factor_snow_doc: Coast and Rocky Mts, Shea et al., 2009
+surface.pdd.factor_ice_doc: Coast and Rocky Mts, Shea et al., 2009
+surface.pdd.refreeze: 0.0
+
+// paleo precip correction
+atmosphere.precip_exponential_factor_for_temperature: 0.07041666667
+atmosphere.precip_exponential_factor_for_temperature_doc: 0.169/2.4, Huybrechts, 2002
+
+// time stepping
+time_stepping.maximum_time_step: 1.0
+time_stepping.hit_extra_times: yes
+time_stepping.hit_ts_times: yes
