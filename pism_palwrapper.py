@@ -49,7 +49,7 @@ template = '''#!/bin/bash
 
 
 def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, lz=5000, lbz=3000,
-                   topg_to_phi=None):
+                   topg_to_phi=None, pism_root=pism_root):
     """Prepare bootstrapping arguments for given file."""
 
     # check if bootstrapping is needed
@@ -86,7 +86,7 @@ def get_input_args(i_file, bootstrap=True, mz=51, mbz=31, lz=5000, lbz=3000,
     return input_args
 
 
-def get_atm_args(atm_file=None, lapse_rate=None,
+def get_atm_args(atm_file=None, lapse_rate=None, pism_root=pism_root,
                  dt_file=None, dp_file=None, fp_file=None, pp_file=None):
     """Prepare atmosphere arguments depending on modifier files provided."""
 
@@ -143,7 +143,7 @@ def get_atm_args(atm_file=None, lapse_rate=None,
     return atm_args
 
 
-def get_surface_args(sd_file=None):
+def get_surface_args(sd_file=None, pism_root=pism_root):
     """Prepare ocean arguments depending on modifier files provided."""
 
     # always use PDD model with period of one year
@@ -160,7 +160,7 @@ def get_surface_args(sd_file=None):
     return surface_args
 
 
-def get_ocean_args(dsl_file=None, om_file=None):
+def get_ocean_args(dsl_file=None, om_file=None, pism_root=pism_root):
     """Prepare ocean arguments depending on modifier files provided."""
 
     ocean_args = ''
@@ -182,7 +182,7 @@ def get_ocean_args(dsl_file=None, om_file=None):
     return ocean_args
 
 
-def make_config(config, out_dir=None):
+def make_config(config, out_dir=None, pism_root=pism_root):
     """Create configuration file and return its path."""
 
     # ensure that config is a list
@@ -225,18 +225,18 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    fp_file=None, pp_file=None, sd_file=None, dsl_file=None,
                    om_file=None, extra_vars=extra_vars,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
-                   mpi_exec=mpi_exec, pism_exec=pism_exec,
+                   mpi_exec=mpi_exec, pism_exec=pism_exec, pism_root=pism_root,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
                    ntasks_per_node=36, **boot_kwargs):
     """Create job script and return its path."""
 
     # get input and component model arguments
-    input_args = get_input_args(i_file, **boot_kwargs)
+    input_args = get_input_args(i_file, pism_root=pism_root, **boot_kwargs)
     atm_args = get_atm_args(atm_file=atm_file, lapse_rate=lapse_rate,
                             dt_file=dt_file, dp_file=dp_file, fp_file=fp_file,
-                            pp_file=pp_file)
-    surface_args = get_surface_args(sd_file=sd_file)
-    ocean_args = get_ocean_args(dsl_file=dsl_file, om_file=om_file)
+                            pp_file=pp_file, pism_root=pism_root)
+    surface_args = get_surface_args(sd_file=sd_file, pism_root=pism_root)
+    ocean_args = get_ocean_args(dsl_file=dsl_file, om_file=om_file, pism_root=pism_root)
 
     # format script
     script = template.format(**locals())
@@ -327,7 +327,7 @@ def submit_chain(job_path_list, depends=None):
 
 
 def make_all(i_file, config,
-             out_dir, submit=True, **kwargs):
+             out_dir, submit=True, pism_root=pism_root, **kwargs):
     """Create new directory, job script and config file."""
 
     # make new directory or break if existing
@@ -338,11 +338,11 @@ def make_all(i_file, config,
         return 2
 
     # make config file
-    c_path = make_config(config, out_dir=out_dir)
+    c_path = make_config(config, out_dir=out_dir, pism_root=pism_root)
 
     # make job script chain
     j_list = make_chain(i_file,
-                        out_dir=out_dir, **kwargs)
+                        out_dir=out_dir, pism_root=pism_root, **kwargs)
 
     # submit job chain
     if submit is True:
