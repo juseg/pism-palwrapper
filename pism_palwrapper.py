@@ -1,6 +1,10 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+# Copyright (c) 2015--2018, Julien Seguinot <seguinot@vaw.baug.ethz.ch>
+# GNU General Public License v3.0+ (https://www.gnu.org/licenses/gpl-3.0.txt)
 
-"""A PISM wrapper for paleo-jobs."""
+"""
+Submit Parallel Ice Sheet Model job chains on Piz Daint.
+"""
 
 import argparse
 import os
@@ -272,7 +276,7 @@ def make_chain(i_file, **kwargs):
             i_file = job_name + '.nc'
 
     # print list of job scripts
-    print 'Created scripts:\n' + '\n'.join(job_path_list)
+    print("Created scripts:\n" + "\n".join(job_path_list))
 
     # return list of job script
     return job_path_list
@@ -311,7 +315,7 @@ def submit_chain(job_path_list, depends=None):
         job_id_list.append(job_id)
 
     # print list of job ids
-    print 'Submitted jobs: ' + ' '.join(job_id_list)
+    print("Submitted jobs: " + " ".join(job_id_list))
 
     # return list of job ids
     return job_id_list
@@ -325,7 +329,7 @@ def make_all(i_file, config,
     try:
         os.makedirs(out_dir)
     except OSError:
-        print "Directory %s exists, skipping it." % out_dir
+        print("Directory %s exists, skipping it." % out_dir)
         return 2
 
     # make config file
