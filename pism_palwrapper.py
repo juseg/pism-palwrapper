@@ -16,6 +16,15 @@ mpi_exec = 'srun --ntasks-per-node 36'
 pism_exec = '/users/jsegu/software/opt/pism-0.7.3/daint-gnu/bin/pismr'
 pism_root = os.path.expanduser('~/pism')
 
+# extra variables
+coords_vars='cell_area,lat,lon,rank'
+smb_vars = 'climatic_mass_balance,saccum,smelt,srunoff'  # I need to try these
+common_vars = 'mask,thk,topg,usurf,velsurf'  # 6x used in animations etc
+thermo_vars = 'tempicethk_basal,temppabase,velbase'  # 4x often used
+hydrol_vars = 'bmelt,bwat,bwatvel,tillwat'  # 4x only hydro except bmelt
+useful_vars = 'bwprel,hardav,diffusivity,tauc,tempsurf'  # 4x potentially useful
+unused_vars = 'climatic_mass_balance,dbdt,dHdt,taub,taud,wvelbase,wvelsurf'
+extra_vars = ','.join((coords_vars, common_vars, thermo_vars))
 
 # job script template
 template = '''#!/bin/bash
@@ -35,11 +44,7 @@ template = '''#!/bin/bash
     -config_override config.nc {atm_args} {surface_args} {ocean_args} \\
     -ts_file {prefix}-ts.nc -ts_times {yts} \\
     -extra_file {prefix}-extra.nc -extra_times {yextra} \\
-    -extra_vars bmelt,bwat,bwatvel,bwp,cell_area,climatic_mass_balance,dbdt,\\
-dHdt,diffusivity,lat,lon,mask,rank,taub,tauc,taud,tempicethk_basal,temppabase,\\
-tempsurf,thk,tillwat,topg,usurf,velbase,velbase_mag,velsurf,velsurf_mag,\\
-wvelbase,wvelsurf
-
+    -extra_vars {extra_vars}
 '''
 
 
@@ -218,7 +223,7 @@ def make_config(config, out_dir=None):
 
 def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    fp_file=None, pp_file=None, sd_file=None, dsl_file=None,
-                   om_file=None,
+                   om_file=None, extra_vars=extra_vars,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
                    mpi_exec=mpi_exec, pism_exec=pism_exec,
                    nodes=1, time='24:00:00', out_dir=None, prefix='run',
