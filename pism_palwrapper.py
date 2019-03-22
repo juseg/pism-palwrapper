@@ -29,21 +29,21 @@ extra_vars = ','.join((coords_vars, common_vars, thermo_vars))
 # job script template
 template = '''#!/bin/bash
 #
-#SBATCH --job-name={prefix}
+#SBATCH --job-name={job_name}
 #SBATCH --nodes={nodes}
 #SBATCH --ntasks-per-node={ntasks_per_node}
 #SBATCH --time={time}
-#SBATCH --output={prefix}.log
-#SBATCH --error={prefix}.err
+#SBATCH --output=log.{job_name}.txt
+#SBATCH --error=err.{job_name}.txt
 #SBATCH --constraint=mc
 
 {mpi_exec} {pism_exec} \\
     {input_args} \\
-    -o {prefix}.nc \\
+    -o out.{job_name}.nc \\
     -ys {ys} -ye {ye} \\
     -config_override config.nc {atm_args} {surface_args} {ocean_args} \\
-    -ts_file {prefix}-ts.nc -ts_times {yts} \\
-    -extra_file {prefix}-extra.nc -extra_times {yextra} \\
+    -ts_file ts.{job_name}.nc -ts_times {yts} \\
+    -extra_file ex.{job_name}.nc -extra_times {yextra} \\
     -extra_vars {extra_vars}
 '''
 
@@ -226,7 +226,7 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    om_file=None, extra_vars=extra_vars,
                    lapse_rate=6.0, ys=0.0, ye=1000.0, yts=10, yextra=100,
                    mpi_exec=mpi_exec, pism_exec=pism_exec, pism_root=pism_root,
-                   nodes=1, time='24:00:00', out_dir=None, prefix='run',
+                   nodes=1, time='24:00:00', out_dir=None, job_name='unnamed',
                    ntasks_per_node=36, **boot_kwargs):
     """Create job script and return its path."""
 
@@ -242,7 +242,7 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
     script = template.format(**locals())
 
     # write script to file
-    script_path = os.path.join(out_dir, prefix + '.sh')
+    script_path = os.path.join(out_dir, 'job.' + job_name + '.sh')
     with open(script_path, 'w') as f:
         f.write(script)
 
@@ -263,22 +263,22 @@ def make_chain(i_file, **kwargs):
         ychain = ye - ys
 
     # create the first jobscript
-    boot_job_name = 'y%07d' % (ychain)
+    boot_job_name = '{:07d}'.format(ychain)
     boot_job_path = make_jobscript(i_file,
-                                   ys=ys, ye=ys+ychain, prefix=boot_job_name,
+                                   ys=ys, ye=ys+ychain, job_name=boot_job_name,
                                    bootstrap=True, **kwargs)
     job_path_list = [boot_job_path]
 
     # create the next jobscripts if necessary
-    i_file = boot_job_name + '.nc'
+    i_file = 'out.' + boot_job_name + '.nc'
     if ychain < (ye-ys):
         for y in range(ys+ychain, ye, ychain):
-            job_name = 'y%07d' % (ychain+y-ys)
+            job_name = '{:07d}'.format(ychain+y-ys)
             job_path = make_jobscript(i_file,
-                                      ys=y, ye=y+ychain, prefix=job_name,
+                                      ys=y, ye=y+ychain, job_name=job_name,
                                       bootstrap=False, **kwargs)
             job_path_list.append(job_path)
-            i_file = job_name + '.nc'
+            i_file = 'out.' + job_name + '.nc'
 
     # print list of job scripts
     print("Created scripts:\n" + "\n".join(job_path_list))
