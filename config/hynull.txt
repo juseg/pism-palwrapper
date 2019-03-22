@@ -1,2 +1,0 @@
-// activate subglacial hydrology routing model
-hydrology_model: null

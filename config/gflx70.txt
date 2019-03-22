@@ -1,1 +1,0 @@
-bootstrapping_geothermal_flux_value_no_var: 0.070

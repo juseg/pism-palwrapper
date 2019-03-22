@@ -1,3 +1,0 @@
-pdd_std_dev_use_param: yes
-pdd_std_dev_param_a: -0.15
-pdd_std_dev_param_b: 0.66
