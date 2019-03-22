@@ -1,3 +1,0 @@
-hydrology_tillwat_max: 1.0
-hydrology_tillwat_max_units: "meters"
-

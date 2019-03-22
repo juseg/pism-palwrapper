@@ -1,0 +1,4 @@
+// Soft bed config used in Seguinot et al. (2016)
+till_effective_fraction_overburden: 0.010
+hydrology_tillwat_max: 1.0
+hydrology_tillwat_max_units: meters

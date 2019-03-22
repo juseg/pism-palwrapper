@@ -1,1 +1,0 @@
-till_effective_fraction_overburden: 0.050

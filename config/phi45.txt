@@ -1,1 +1,0 @@
-bootstrapping_tillphi_value_no_var: 45.0

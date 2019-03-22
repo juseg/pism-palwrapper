@@ -1,2 +1,0 @@
-sia_enhancement_factor: 5.0
-sia_enhancement_factor_doc: Recommended value for ice age polar ice in Cuffey and Patterson (2010)

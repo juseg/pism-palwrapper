@@ -1,0 +1,3 @@
+// Constant average till friction angle
+basal_yield_stress.mohr_coulomb.till_phi_default: 30.0
+basal_yield_stress.mohr_coulomb.till_phi_default_doc: Cuffey and Paterson (2010)

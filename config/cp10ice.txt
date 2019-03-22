@@ -1,0 +1,17 @@
+// Rheology from Cuffey and Paterson (2010)
+flow_law.Paterson_Budd.A_cold: 2.847e-13
+flow_law.Paterson_Budd.A_warm: 2.356e-02
+flow_law.Paterson_Budd.Q_cold: 60e3
+flow_law.Paterson_Budd.Q_warm: 115e3
+flow_law.Paterson_Budd.A_cold_units: Pascal-3 / second
+flow_law.Paterson_Budd.A_warm_units: Pascal-3 / second
+flow_law.Paterson_Budd.Q_cold_units: Joule / mol
+flow_law.Paterson_Budd.Q_warm_units: Joule / mol
+flow_law.Paterson_Budd.A_cold_doc: Cuffey and Paterson (2010)
+flow_law.Paterson_Budd.A_warm_doc: Cuffey and Paterson (2010)
+flow_law.Paterson_Budd.Q_cold_doc: Cuffey and Paterson (2010)
+flow_law.Paterson_Budd.Q_warm_doc: Cuffey and Paterson (2010)
+
+// Holocene polar ice enhancement factor
+sia_enhancement_factor: 2.0
+sia_enhancement_factor_doc: Recom. holocene polar ice, Cuffey and Paterson (2010)

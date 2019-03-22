@@ -1,0 +1,4 @@
+// Hard bed config used in Seguinot et al. (2016)
+till_effective_fraction_overburden: 0.050
+hydrology_tillwat_max: 5.0
+hydrology_tillwat_max_units: meters
