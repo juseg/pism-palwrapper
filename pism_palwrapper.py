@@ -300,7 +300,7 @@ def submit_job(job_path, depends=None):
 
     # run sbatch command
     cmd.append(job_path)
-    out = subprocess.check_output(cmd)
+    out = subprocess.check_output(cmd, universal_newlines=True)
 
     # return job id
     job_id = out.rstrip('\n').split(' ')[-1]
