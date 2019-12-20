@@ -39,8 +39,7 @@ template = '''#!/bin/bash
 
 {mpi_exec} {pism_exec} \\
     {input_args} \\
-    -o out.{job_name}.nc \\
-    -ys {ys} -ye {ye} \\
+    -o out.{job_name}.nc -ye {ye} \\
     -config_override config.nc {atm_args} {surface_args} {ocean_args} \\
     -ts_file ts.{job_name}.nc -ts_times {yts} \\
     -extra_file ex.{job_name}.nc -extra_times {yextra} \\
