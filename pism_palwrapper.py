@@ -230,6 +230,9 @@ def make_jobscript(i_file, atm_file=None, dt_file=None, dp_file=None,
                    ntasks_per_node=36, **boot_kwargs):
     """Create job script and return its path."""
 
+    # expand path to PISM root
+    pism_root = os.path.abspath(pism_root)
+
     # get input and component model arguments
     input_args = get_input_args(i_file, pism_root=pism_root, **boot_kwargs)
     atm_args = get_atm_args(atm_file=atm_file, lapse_rate=lapse_rate,
