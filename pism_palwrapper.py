@@ -16,15 +16,15 @@ mpi_exec = 'srun --ntasks-per-node 36'
 pism_exec = '/users/jsegu/software/opt/pism-0.7.3/daint-gnu/bin/pismr'
 pism_root = os.path.expanduser('~/pism')
 
-# extra variables
-coords_vars='cell_area,lat,lon,rank'
-smb_vars = 'climatic_mass_balance,saccum,smelt,srunoff'  # I need to try these
+# extra variables  # FIXME implement smart defaults
+coords_vars='lat,lon,rank'
 common_vars = 'mask,thk,topg,usurf,velsurf'  # 6x used in animations etc
+surfmb_vars = 'climatic_mass_balance,pdd_fluxes'  # 4x surface mass fluxes
 thermo_vars = 'tempicethk_basal,temppabase,velbase'  # 4x often used
 hydrol_vars = 'bmelt,bwat,bwatvel,tillwat'  # 4x only hydro except bmelt
 useful_vars = 'bwprel,hardav,diffusivity,tauc,tempsurf'  # 4x potentially useful
 unused_vars = 'climatic_mass_balance,dbdt,dHdt,taub,taud,wvelbase,wvelsurf'
-extra_vars = ','.join((coords_vars, common_vars, thermo_vars))
+extra_vars = ','.join((coords_vars, common_vars, surfmb_vars, thermo_vars))
 
 # job script template
 template = '''#!/bin/bash
