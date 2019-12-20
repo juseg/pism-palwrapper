@@ -144,7 +144,7 @@ def get_atm_args(atm_file=None, lapse_rate=None, pism_root=pism_root,
 
 
 def get_surface_args(sd_file=None, pism_root=pism_root):
-    """Prepare ocean arguments depending on modifier files provided."""
+    """Prepare surface arguments depending on modifier files provided."""
 
     # always use PDD model with period of one year
     surface_args = '''\\
@@ -166,11 +166,12 @@ def get_ocean_args(dsl_file=None, om_file=None, pism_root=pism_root):
     ocean_args = ''
 
     # check for a sea level change file
+    # FIXME ocean pik should be independent from sea level
     if dsl_file:
         dsl_path = os.path.join(pism_root, 'input', 'dsl', dsl_file)
         ocean_args = '''\\
-    -ocean pik,delta_SL \\
-        -ocean_delta_SL_file {dsl_path}'''.format(**locals())
+    -ocean pik -sea_level constant,delta_sl \\
+        -ocean_delta_sl_file {dsl_path}'''.format(**locals())
 
     # check for an ocean mask file
     if om_file:
